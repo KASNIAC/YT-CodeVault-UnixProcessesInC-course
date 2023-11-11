@@ -1,7 +1,6 @@
-*.exe
-*.o
-*.out
-
+# Ignorar ejecutables
 *
-!/**/
-!*.*
+!*/
+!*.c
+!*.cpp
+!*.h
