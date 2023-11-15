@@ -4,6 +4,7 @@
 #include<unistd.h>
 #include <sys/wait.h>
 
+// Each process has a copy of its own variables (its own space in memory)
 int main(int argc, char* argv[]){
     int id = fork();
     int n;

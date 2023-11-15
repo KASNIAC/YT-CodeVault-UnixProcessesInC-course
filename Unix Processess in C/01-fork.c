@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]){
 	// id == 0 means that's the child process
-	// id != 0 means that's the main process
+	// id != 0 means that's the main process (it refers to the idProcess of his child)
 	
 	int id = fork(); // returns the process ID
 	// fortk(); 	// <- If I had n fork(); I would have 2^n processes
