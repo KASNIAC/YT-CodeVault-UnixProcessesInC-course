@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
     if(id == 0){
         n = 1;
     } else{
-        wait(NULL);     // We jsut have to call it in the main process in order to wait the child process finish its work
+        wait(NULL);     // We just have to call it in the main process in order to wait the child process finish its work
         n = 6;
     }
     
