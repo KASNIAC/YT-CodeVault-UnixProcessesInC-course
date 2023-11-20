@@ -5,3 +5,6 @@
 !*.cpp
 !*.h
 *.vscode
+!*.png
+!*.jpg
+!*.sh
