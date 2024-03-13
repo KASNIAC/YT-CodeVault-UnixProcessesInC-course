@@ -1,11 +1,11 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#include<unistd.h> // Used in linux for threads and process
+#include<unistd.h> // used in linux for threads and processes
 
 int main(int argc, char* argv[]){
 	int id = fork();
-	if(id != 0){
+	if(id != 0){ // I just need three processes
 		fork();
 	}
 	
