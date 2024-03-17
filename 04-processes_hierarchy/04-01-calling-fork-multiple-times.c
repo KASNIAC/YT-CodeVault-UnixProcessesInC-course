@@ -16,7 +16,7 @@ int main(int argc, char* argv[]){
         if(id2 == 0){
             printf("We are process Y\n"); // Level 2
         } else {
-            printf("We are oricess X\n"); // Level 1
+            printf("We are process X\n"); // Level 1
         }
     } else{
         if(id2 == 0){
@@ -27,9 +27,12 @@ int main(int argc, char* argv[]){
     }
 
     // wait(NULL); just waits for ONE process to finish (whichever finished first), so the problem of zombies process will continue
-    // Solution:
-    while(wait(NULL) != -1 || errno != ECHILD){ // While we were wainting for something. (When equals -1 then we are not waiting for anything)
-        // errno != ECHILD to avoid some errors wait(NULL) might produce
+    // due the parent process has two children
+
+    // Solution: While we were wainting for something. (When wait() equals -1 then we are not waiting for anything)
+    while(wait(NULL) != -1 || errno != ECHILD){ 
+        // errno != ECHILD is to make sure that the error that we got (-1 of wait()) means that we don't have any more children
+        // It's neccesary due there may be other reasons why wait() returns -1
         printf("Waited for a child to finish\n");
     }
     return 0;

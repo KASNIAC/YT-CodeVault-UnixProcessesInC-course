@@ -29,6 +29,9 @@ int main(int argc, char *argv[]) {
 }
 
 /*
+   wait(NULL); Returns -1 if there's nothing to wait for. 
+      - Otherwise returns a value that is the process ID (PID) of the child whose status information has been obtained.
+
    wait(status_ptr); The argument status_ptr points to a location where wait() can store a status value.
       - This status value is zero if the child process explicitly returns zero status.
       - The status_ptr pointer may also be NULL, in which case wait() ignores the child's return status.
