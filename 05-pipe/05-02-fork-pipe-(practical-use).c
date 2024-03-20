@@ -57,6 +57,16 @@ int main(int argc, char* argv[]) {
         wait(NULL); // Wait the children to finish its execution
         // We don't have to wait the children got the sum first (to set the wait at the beginning of the last 'else' block), cause:
         // The read() function will wait until there is something in that pipe to be read. So the call won't return until the other process calls write()
+        
+        /*
+            Almost certainly the process that executes the write has already finished while the parent executes the read, 
+            however there is a small possibility that this will not happen (Example, the process that executed the write 
+            sleeps). In that case the wait is necessary.
+
+            It is a good practice to use wait in the parent process, in this case read will block (wait to read what the 
+            other process sends) and most likely when the parent process executes the read, the children will have already
+            finished because he did not fall asleep.
+        */
     }
     
     return 0;
