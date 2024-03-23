@@ -1,73 +1,98 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-int main(int argc, char* argv[]) {
-    // A process will sum a half of the numbers in the array, and the other one is going to sum the rest
-    int arr[] = { 1, 2, 3, 4, 1, 2, 7, 7 };
-    int arrSize = sizeof(arr) / sizeof(int);
+// Task: I will have four processes and each one will make a quarter of the sum.
+int main(int argc, char *argv[]) {
+   int arr[] = {1, 2, 3, 4, 1, 2, 7};
+   int arrSize = sizeof(arr) / sizeof(int);
 
-    int start, end;
-    
-    int fd[2];
-    if (pipe(fd) == -1) {
-        return 1;
-    }
-    
-    int id = fork();
-    if (id == -1) {
-        return 2;
-    }
-    
-    if (id == 0) {
-        start = 0;
-        end = arrSize / 3;
-    } else {
-        int id2 = fork();
-        if(id2 == -1){
-            return 5;
-        }
+   int start, end;
 
-        if(id2 == 0){
-            start = arrSize / 3;
-            end = 2*arrSize / 3;
-        } else{
-            start = 2*arrSize / 3;
-            end = arrSize;
-        }
-    }
-    
-    int sum = 0;
-    for (int i = start; i < end; i++) {
-        sum += arr[i];
-    }
-    
-    printf("Calculated partial sum: %d\n", sum);
-    
-    // if (id == 0) {
-    //     close(fd[0]);
-    //     if (write(fd[1], &sum, sizeof(int)) == -1) {
-    //         return 3;
-    //     }
-    //     close(fd[1]);
-    // } else {
-    //     int sumFromChild;
-    //     close(fd[1]);
-    //     if (read(fd[0], &sumFromChild, sizeof(int)) == -1) {
-    //         return 4;
-    //     }
-    //     close(fd[0]);
+   int fd1[2];
+   int fd2[2];
+   int fd3[2];
+   if (pipe(fd1) == -1 || pipe(fd2) == -1 || pipe(fd3) == -1) {
+      return 1;
+   }
 
-    //     int totalSum = sum + sumFromChild;
-    //     printf("Total sum is %d\n", totalSum);
+   int id1 = fork();
+   int id2 = fork();
+   if (id1 == -1 || id2 == -1) {
+      return 2;
+   }
 
-    //     wait(NULL); // Wait the children to finish its execution
-    //     // We don't have to wait the children got the sum first (to set the wait at the beginning of the last 'else' block), cause:
-    //     // The read() function will wait until there is something in that pipe to be read. So the call won't return until the other process calls write()
-    // }
-    
-    return 0;
+   if(id1 == 0 && id2 == 0){
+      start = 0;
+      end = arrSize / 4;
+   } else if(id1 == 0 && id2 != 0){
+      start = arrSize / 4;
+      end = arrSize / 2;
+   } else if(id1 != 0 && id2 == 0){
+      start = arrSize / 2;
+      end = (3 * (arrSize)) / 4;
+   } else {
+      start = (3 * (arrSize)) / 4;
+      end = arrSize;
+   }
+
+   int sum = 0;
+   for (int i = start; i < end; i++) {
+      sum += arr[i];
+   }
+
+   printf("I'm: %d\nMy parent is: %d\nid1: %d  -  id2: %d\nCalculated partial sum: %d\n\n",getpid(), getppid(), id1, id2, sum);
+
+    // I think it's necessary to close some file descrioptor pipes
+   if(id1 == 0 && id2 == 0){
+      close(fd1[0]);
+      if(write(fd1[1], &sum, sizeof(int)) == -1){
+         return 3;
+      }
+      close(fd1[1]);
+   } else if(id1 == 0 && id2 != 0){
+      int sumFromChild;
+      close(fd1[1]);
+      if (read(fd1[0], &sumFromChild, sizeof(int)) == -1) {
+         return 4;
+      }
+      close(fd1[0]);
+
+      int partialSum1 = sum + sumFromChild;
+
+      close(fd2[0]);
+      if(write(fd2[1], &partialSum1, sizeof(int)) == -1){
+         return 5;
+      }
+      close(fd2[1]);
+
+      wait(NULL);
+   } else if(id1 != 0 && id2 == 0){
+      close(fd3[0]);
+      if(write(fd3[1], &sum, sizeof(int)) == -1){
+         return 6;
+      }
+      close(fd3[1]);
+   } else {
+      close(fd2[1]);
+      close(fd3[1]);
+
+      int sumFromChild1, sumFromChild2;
+      if(read(fd2[0], &sumFromChild1, sizeof(int)) == -1 || read(fd3[0], &sumFromChild2, sizeof(int)) == -1){
+         return 7;
+      }
+      
+      close(fd2[0]);
+      close(fd3[0]);
+
+      int totalSum = sumFromChild1 + sumFromChild2 + sum;
+
+      printf("Total sum is %d\n", totalSum);
+      wait(NULL);
+   }
+
+   return 0;
 }

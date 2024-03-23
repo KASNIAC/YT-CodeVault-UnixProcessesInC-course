@@ -4,7 +4,7 @@
 #include <sys/wait.h> // getpid() - getppid()
 #include <unistd.h>
 
-// This is another way to avoid zombies processes
+// This is another way to avoid orphan processes
 int main(int argc, char *argv[]) {
    int id = fork();
 
