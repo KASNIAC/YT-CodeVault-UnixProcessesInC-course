@@ -1,0 +1,23 @@
+Proceso zombie: ya terminó, pero que el padre no ha revisado su estado (mientras el padre no haya revisado su estado, esa información se queda guardada esperando a que el padre la cheque). La idea es que el padre pueda saber cómo terminó su hijo. Tecnicamente todo proceso se vuelve zombie al menos un instante debido a que el estado zombie es el estado que ocurre despues de morir pero antes de que el padre cheque el estado final.
+
+Proceso huérfano: cuando su padre muere antes de que el hijo termine. Cuando un proceso queda huerfano, el proceso init lo adopta; cuando un proceso adoptado por init termina init de inmediato checa el estado de ese proceso adoptado que ya terminó para que no quede como zombie.
+
+En general es buena practica que un padre se encargue de sus hijos para que init no los tenga que adoptar.
+
+Si mientras un proceso es zombie su padre muere, init lo adopta y de inmediato revisa el estado de su nuevo hijo muerto, así que los zombies se liberan en ese momento.
+
+En resúmen:
+
+Situación 1:
+- Hay un proceso hijo muere
+- Queda "zombie" porque su estado final se queda guardado hasta que lo vea su padre
+- En el momento en el que su padre revisa el estado final del hijo muerto la informacion del proceso hijo finalmente se libera, antes no.
+
+Situación 2:
+- Hay un proceso hijo
+- Su padre muere
+- El proceso queda huerfano
+- Init lo adopta
+
+El verdadero problema:
+Un proceso tiene muchos hijos, los hijos terminan mientras el padre sigue vivo pero nunca checa el estado final de los hijos, entonces los hijos se quedan zombies hasta que el padre haga el favor de checar su estado, o hasta que el padre se muera para que init llegue a salvar el asunto. Durante todo ese tiempo los hijos muertos en estado zombie siguen usando una entrada de la tabla de procesos lo cual consume recursos.
